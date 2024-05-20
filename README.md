@@ -18,5 +18,7 @@ App that tracks the International Space Station
 
 ## Credits
 https://celestrak.org/NORAD/elements/
+
 https://github.com/shashwatak/satellite-js
+
 https://dev.to/omar4ur/create-a-satellite-tracker-from-scratch-in-30-lines-of-javascript-32gk
