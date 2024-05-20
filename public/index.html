@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Cesium with Express</title>
+    </head>
+    <style>
+        html, body, #cesiumContainer {
+            width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
+        }
+        #buttonTrack {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 5;
+            scale: 250px;
+        }
+        #buttonUntrack {
+            position: absolute;
+            top: 40px;
+            left: 10px;
+            z-index: 5;
+            scale: 250px;
+        }
+        #locationData {
+            position: absolute;
+            bottom: 100px;
+            right: 100px;
+            z-index: 5;
+            background-color: rgba(42, 42, 42, 0.8);
+            color: white;
+            padding: 20px;
+            font-family: sans-serif;
+            font-size: 18px;
+            border-radius: 5px;
+        }
+        #locationData h2 {
+            margin: 0 0 10px 0;
+            font-size: 20px;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div id="cesiumContainer"></div>
+    <div id="buttonContainer">
+        <button id="buttonTrack">Click to track satellite</button>
+        <button id="buttonUntrack">Click to untrack satellite</button>
+    </div>
+    <div id="locationData">
+        <h2>ISS (ZARYA) Location</h2>
+        <div>Longitude: <span id="longitude">-</span></div>
+        <div>Latitude: <span id="latitude">-</span></div>
+    </div>
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.81/Build/Cesium/Cesium.js"></script>
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.81/Build/Cesium/Widgets/widgets.css" rel="stylesheet"></link>
+    <script>
+        //initialize the Cesium viewer.
+        const viewer = new Cesium.Viewer('cesiumContainer', {
+            imageryProvider: new Cesium.TileMapServiceImageryProvider({
+                url: Cesium.buildModuleUrl("Assets/Textures/NaturalEarthII"),
+            }),
+            baseLayerPicker: false, geocoder: false, homeButton: false, infoBox: false,
+            navigationHelpButton: false, sceneModePicker: false
+            });
+        viewer.scene.globe.enableLighting = true;
+        const satellitePosition = new Cesium.SampledPositionProperty();
+        
+        //add image of satellite to the viewer
+        const satellitePoint = viewer.entities.add({
+            position: satellitePosition,
+            point: { pixelSize: 10, color: Cesium.Color.RED },
+            label: {
+                text: "ISS (ZARYA)",
+                font: '14px sans-serif',
+                fillColor: Cesium.Color.WHITE,
+                outlineColor: Cesium.Color.BLACK,
+                outlineWidth: 2,
+                verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                pixelOffset: new Cesium.Cartesian2(0, -20) },
+
+                path: {
+                resolution: 1,
+                material: new Cesium.PolylineGlowMaterialProperty({
+                    glowPower: 0.1,
+                    color: Cesium.Color.YELLOW
+                }),
+                width: 5,
+                leadTime: 0, //only show trailing path
+                trailTime: 3600 //one hour
+            }
+        });
+
+    //fetch satellite position data from server
+    function updateSatellitePosition() {
+        fetch('/satellite-position')
+            .then(response => response.json())
+            .then(position => {
+
+                const totalSeconds = 60 * 60 * 6;
+                const timestepInSeconds = 40;
+                const start = Cesium.JulianDate.fromDate(new Date());
+                const stop = Cesium.JulianDate.addSeconds(start, totalSeconds, new Cesium.JulianDate());
+                viewer.clock.startTime = start.clone();
+                viewer.clock.stopTime = stop.clone();
+                viewer.clock.currentTime = start.clone();
+                viewer.timeline.zoomTo(start, stop);
+                viewer.clock.multiplier;
+                viewer.clock.clockRange = Cesium.ClockRange.LOOP_STOP;
+
+                //get current time
+                const time = Cesium.JulianDate.now();
+                //convert Satellite position to Cartesian3
+                const cartesianPos = Cesium.Cartesian3.fromRadians(position.longitude, position.latitude, position.height * 1000);
+                //add satellite position sample
+                satellitePosition.addSample(time, cartesianPos);
+
+                //convert radians to degrees for display purposes
+                const longitudeDeg = Cesium.Math.toDegrees(position.longitude).toFixed(6);
+                const latitudeDeg = Cesium.Math.toDegrees(position.latitude).toFixed(6);
+                const heightKm = (position.height * 1000).toFixed(2); // Convert height to meters
+
+                //set the HTML content
+                document.getElementById('longitude').textContent = longitudeDeg;
+                document.getElementById('latitude').textContent = latitudeDeg;
+                document.getElementById('height').textContent = heightKm;
+            });
+    }
+    //update satellite position every second
+    setInterval(updateSatellitePosition, 1000);
+
+    //track the satellite
+    document.getElementById('buttonTrack').addEventListener('click', function() {
+        viewer.trackedEntity = satellitePoint;
+    });
+    //untrack the satellite
+    document.getElementById('buttonUntrack').addEventListener('click', function() {
+        viewer.trackedEntity = undefined;
+        viewer.camera.flyHome(0);
+    });
+    </script>
+</body>
+</html>
