@@ -1,9 +1,10 @@
 # SatTracker
 App that tracks the International Space Station
 
-<img src="https://github.com/pacellidomonic/BrickBreaker-Game/assets/63662881/44188c8c-025a-4cb2-8081-a86c88b589c9" width="400"/>
+<img src="https://github.com/pacellidomonic/SatTracker/assets/63662881/f1ad265b-a6b5-4931-9215-634ee1bc222e" width="400"/>
 
 ## Instructions
+
 1. Download the repository
 2. import the node modules
   a. npm - express
@@ -15,6 +16,8 @@ App that tracks the International Space Station
 ## How to use
 1. Two buttons in the code for following and unfollowing the satellite
 2. Unable to use the cesium fastforward/ rewind buttons using my current code
+3. 
+<img src="https://github.com/pacellidomonic/SatTracker/assets/63662881/4f34e515-dc29-4352-afbe-82fbb37af093" width="400"/>
 
 ## Credits
 https://celestrak.org/NORAD/elements/
