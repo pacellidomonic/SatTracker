@@ -16,7 +16,7 @@ App that tracks the International Space Station
 ## How to use
 1. Two buttons in the code for following and unfollowing the satellite
 2. Unable to use the cesium fastforward/ rewind buttons using my current code
-3. 
+
 <img src="https://github.com/pacellidomonic/SatTracker/assets/63662881/4f34e515-dc29-4352-afbe-82fbb37af093" width="400"/>
 
 ## Credits
