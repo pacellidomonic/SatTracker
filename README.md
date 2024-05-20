@@ -1,10 +1,13 @@
 # SatTracker
-App that tracks the International Space Station
+App that tracks the International Space Station using node.js express and cesium
 
 <img src="https://github.com/pacellidomonic/SatTracker/assets/63662881/f1ad265b-a6b5-4931-9215-634ee1bc222e" width="400"/>
 
-## Instructions
+# About
+* The SatTracker uses TLE data from CelesTrak for the International Space Station. How the TLE data works is a description is taken from the satellites orbit and used through satellite.js to predict the future orbit of the satellite. There are a lot of satellites on the CelesTrak website and my code can be refactored to track any or multiple satellites.
 
+
+## Instructions
 1. Download the repository
 2. import the node modules
   a. npm - express
